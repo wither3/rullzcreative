@@ -46,7 +46,7 @@ app.get('/tmate/download', async (req, res) => {
     }
   } catch (error) {
     console.error('Terjadi kesalahan saat mendownload:', error);
-    return res.status(500).json({ error: 'Terjadi kesalahan saat mendownload.', error });
+    return res.status(500).json({ error: 'Terjadi kesalahan saat mendownload.'});
   }
 });
 
