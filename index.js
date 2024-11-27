@@ -29,6 +29,31 @@ app.get('/tiktok/download', async (req, res) => {
   }
 });
 
+app.get('/tmate/download', async (req, res) => {
+  const url = req.query.url; // Mengambil URL dari query parameter
+
+  if (!url) {
+    return res.status(400).json({ error: 'URL tidak boleh kosong' }); // Menangani kasus URL kosong
+  }
+
+  try {
+    const result = await downloadVideo(url); // Memanggil fungsi downloadVideo dengan URL
+
+    if (result) {
+      return res.json(result); // Mengembalikan hasil dalam format JSON
+    } else {
+      return res.status(404).json({ error: 'Tidak ada hasil untuk ditampilkan.' });
+    }
+  } catch (error) {
+    console.error('Terjadi kesalahan saat mendownload:', error);
+    return res.status(500).json({ error: 'Terjadi kesalahan saat mendownload.' });
+  }
+});
+
+
+
+
+
 // Menentukan port untuk server
 const PORT = process.env.PORT || 3000;
 
