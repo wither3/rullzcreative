@@ -8,7 +8,7 @@
   ],
   "routes": [
     {
-      "src": "/api/tiktok/download",
+      "src": "/api/(.*)",
       "dest": "/index.js"
     }
   ]
