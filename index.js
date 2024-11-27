@@ -1,7 +1,7 @@
 // ./index.js
 const express = require('express');
 const cors = require('cors');
-const { downloadTikTok } = require('./codenya/ytdownload'); // Pastikan path ini sesuai dengan lokasi file ytdownload.js
+const { downloadTikTok } = require('./codenya/ttdownload'); // Pastikan path ini sesuai dengan lokasi file ytdownload.js
 
 const app = express();
 
