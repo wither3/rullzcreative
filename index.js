@@ -29,6 +29,39 @@ app.get('/tiktok/download', async (req, res) => {
   }
 });
 
+app.get('/Gemini', async (req, res) => {
+  const messages = req.query.messages; // Ambil parameter messages dari URL
+  const temperature = parseFloat(req.query.temperature) || 0.9; // Parameter opsional
+  const top_p = parseFloat(req.query.top_p) || 0.7; // Parameter opsional
+  const top_k = parseInt(req.query.top_k) || 40; // Parameter opsional
+
+  // Validasi input
+  if (!messages) {
+    return res.status(400).json({ error: 'Parameter "messages" harus disediakan' });
+  }
+
+  try {
+    // Menyiapkan format messages untuk Gemini
+    const options = {
+      messages: [{ role: 'user', content: messages }],
+      temperature,
+      top_p,
+      top_k
+    };
+
+    // Memanggil fungsi Gemini
+    const result = await gemini(options);
+    if (result.success) {
+      res.json(result); // Kembalikan hasil sebagai JSON
+    } else {
+      res.status(500).json({ error: 'Gagal mendapatkan jawaban dari Gemini', details: result.errors });
+    }
+  } catch (error) {
+    console.error('Error saat memproses Gemini:', error);
+    res.status(500).json({ error: 'Terjadi kesalahan internal', details: error.message });
+  }
+});
+
 app.get('/tmate/download', async (req, res) => {
   const url = req.query.url; // Mengambil URL dari query parameter
 
