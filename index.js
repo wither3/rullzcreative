@@ -30,7 +30,7 @@ app.get('/tiktok/download', async (req, res) => {
   }
 });
 
-app.get('/Gemini', async (req, res) => {
+app.get('/gemini', async (req, res) => {
   const messages = req.query.messages; // Ambil parameter messages dari URL
   const temperature = parseFloat(req.query.temperature) || 0.9; // Parameter opsional
   const top_p = parseFloat(req.query.top_p) || 0.7; // Parameter opsional
