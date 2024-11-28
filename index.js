@@ -1,4 +1,5 @@
 // ./index.js
+const gemini = require('./codenya/gemini');
 const express = require('express');
 const cors = require('cors');
 const { downloadTikTok } = require('./codenya/ttdownload'); // Pastikan path ini sesuai dengan lokasi file ttdownload.js
