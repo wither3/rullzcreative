@@ -18,6 +18,8 @@ app.get('/debug', (req, res) => {
     message: 'Debugging',
     tikwm2: typeof tiktokDl,
     gemini: typeof gemini,
+    tmate: typeof downloadVideo,
+    tiksave: typeof downloadTiktok,
     directory: __dirname
   });
 });
