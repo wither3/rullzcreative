@@ -3,6 +3,7 @@ const cors = require('cors');
 const { downloadTikTok } = require('./codenya/ttdownload'); 
 const { downloadVideo } = require('./codenya/tmate.js'); 
 const gemini = require('./codenya/gemini');
+const { tiktokDl } = require('./codenya/tikwm2.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,7 +28,6 @@ app.get('/tikwm/download', async (req, res) => {
     return res.status(400).json({ error: 'URL TikTok harus disediakan dalam query parameter "url".' });
   }
   try {
-    const { tiktokDl } = require('./codenya/tikwm2.js');
     const result = await tiktokDl(url);
     res.json({ success: true, message: 'Data berhasil diunduh', data: result });
   } catch (error) {
