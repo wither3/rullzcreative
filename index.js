@@ -13,6 +13,13 @@ app.use(cors());
 app.use(express.json());
 
 
+app.use((req, res, next) => {
+  if (req.path === '/favicon.png') {
+    return res.status(204).end(); // Tidak mengembalikan konten
+  }
+  next();
+});
+
 app.get('/debug', (req, res) => {
   res.json({
     message: 'Debugging',
