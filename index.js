@@ -1,9 +1,11 @@
-const gemini = require('./codenya/gemini'); // Import modul Gemini
+ // Import modul Gemini
 // ./index.js
 const express = require('express');
 const cors = require('cors');
 const { downloadTikTok } = require('./codenya/ttdownload'); // Pastikan path ini sesuai dengan lokasi file ttdownload.js
 const { downloadVideo } = require('./codenya/tmate.js'); // Pastikan path ini sesuai dengan lokasi file tmate.js
+const { tiktokDl } = require('./codenya/tikwm2');
+const gemini = require('./codenya/gemini');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,6 +15,35 @@ app.use(cors());
 
 // Middleware untuk parsing JSON
 app.use(express.json());
+
+
+
+
+
+
+app.get('/tikwm/download', async (req, res) => {
+    const url = req.query.url; // Ambil URL dari query parameter
+
+    if (!url) {
+        return res.status(400).json({ error: 'URL TikTok harus disediakan dalam query parameter "url".' });
+    }
+
+    try {
+        const result = await tiktokDl(url); // Panggil fungsi tiktokDl
+        res.json({
+            success: true,
+            message: 'Data berhasil diunduh',
+            data: result,
+        });
+    } catch (error) {
+        console.error('Terjadi kesalahan:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Gagal mengunduh data TikTok',
+            error: error.message,
+        });
+    }
+});
 
 // Endpoint untuk mengunduh video TikTok
 app.get('/tiktok/download', async (req, res) => {
