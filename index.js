@@ -11,7 +11,16 @@ const PORT = process.env.PORT || 3000;
 // Middleware untuk mengizinkan CORS
 app.use(cors());
 app.use(express.json());
+Gemini');
 
+app.get('/debug', (req, res) => {
+  res.json({
+    message: 'Debugging',
+    tikwm2: typeof tikwm2,
+    gemini: typeof gemini,
+    directory: __dirname
+  });
+});
 // Endpoint TikTok dengan TikWM
 app.get('/tikwm/download', async (req, res) => {
   const url = req.query.url;
