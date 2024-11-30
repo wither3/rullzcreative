@@ -26,7 +26,7 @@ app.get('/debug', (req, res) => {
     tikwm2: typeof tiktokDl,
     gemini: typeof gemini,
     tmate: typeof downloadVideo,
-    tiksave: typeof downloadTiktok,
+    tiksave: typeof downloadTikTok,
     directory: __dirname
   });
 });
