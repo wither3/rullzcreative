@@ -16,7 +16,7 @@ app.use(express.json());
 app.get('/debug', (req, res) => {
   res.json({
     message: 'Debugging',
-    tikwm2: typeof tikwm2,
+    tikwm2: typeof tiktokDl,
     gemini: typeof gemini,
     directory: __dirname
   });
