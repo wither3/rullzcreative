@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const { downloadTikTok } = require('./codenya/ttdownload'); 
-const { downloadVideo } = require('./codenya/tmate.js'); 
+const { downloadTikTok } = require('./codenya/ttdownload');
+const { downloadVideo } = require('./codenya/tmate.js');
 const gemini = require('./codenya/gemini');
 const { tiktokDl } = require('./tikwm2.js');
 
@@ -12,14 +12,16 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-
+// Middleware untuk mengabaikan favicon.ico
 app.use((req, res, next) => {
   if (req.path === '/favicon.ico') {
-    return res.status(204).end(); // Tidak mengembalikan konten
+    return res.status(204).end(); // Abaikan favicon.ico
   }
+  console.log(`Request received: ${req.method} ${req.path}`); // Log semua permintaan
   next();
 });
 
+// Endpoint Debugging
 app.get('/debug', (req, res) => {
   res.json({
     message: 'Debugging',
@@ -27,9 +29,10 @@ app.get('/debug', (req, res) => {
     gemini: typeof gemini,
     tmate: typeof downloadVideo,
     tiksave: typeof downloadTikTok,
-    directory: __dirname
+    directory: __dirname,
   });
 });
+
 // Endpoint TikTok dengan TikWM
 app.get('/tikwm/download', async (req, res) => {
   const url = req.query.url;
@@ -40,7 +43,7 @@ app.get('/tikwm/download', async (req, res) => {
     const result = await tiktokDl(url);
     res.json({ success: true, message: 'Data berhasil diunduh', data: result });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error TikWM:', error);
     res.status(500).json({ success: false, message: 'Gagal mengunduh data TikTok', error: error.message });
   }
 });
@@ -55,7 +58,7 @@ app.get('/tiktok/download', async (req, res) => {
     const result = await downloadTikTok(url);
     res.json(result);
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error TikTok Downloader:', error);
     res.status(500).json({ error: 'Terjadi kesalahan saat mengambil data' });
   }
 });
@@ -79,7 +82,7 @@ app.get('/Gemini', async (req, res) => {
       res.status(500).json({ error: 'Gagal mendapatkan jawaban dari Gemini', details: result.errors });
     }
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error Gemini:', error);
     res.status(500).json({ error: 'Terjadi kesalahan internal', details: error.message });
   }
 });
@@ -98,16 +101,17 @@ app.get('/tmate/download', async (req, res) => {
       res.status(404).json({ error: 'Tidak ada hasil untuk ditampilkan.' });
     }
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error Tmate:', error);
     res.status(500).json({ error: 'Terjadi kesalahan saat mendownload.' });
   }
 });
 
-                         
-
+// Handler untuk rute yang tidak ditemukan
+app.use((req, res) => {
+  res.status(404).json({ error: 'Path not defined. Pastikan Anda menggunakan URL yang benar.' });
+});
 
 // Menjalankan server
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);
 });
-           
