@@ -3,7 +3,7 @@ const cors = require('cors');
 const { downloadTikTok } = require('./codenya/ttdownload'); 
 const { downloadVideo } = require('./codenya/tmate.js'); 
 const gemini = require('./codenya/gemini');
-const { tiktokDl } = require('./codenya/tikwm2.js');
+const { tiktokDl } = require('./tikwm2.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
