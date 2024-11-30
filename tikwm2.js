@@ -46,7 +46,8 @@ console.log(res);
   name: res.author.nickname,
   region: res.region,
   title: res.title,
-  cover: res.cover,
+  avatar: `https://www.tikwm.com${res.author.avatar}`,
+  cover: `https://www.tikwm.com${res.cover}`,
   duration: res.duration,
   video: {
     noWatermark: `https://www.tikwm.com${res.play}`,
