@@ -6,8 +6,6 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "codenya-tikwm2": "file:./codenya/tikwm2.js",
-  "codenya-gemini": "file:./codenya/gemini.js",
     "axios": "^1.7.8",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
