@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { downloadTikTok } = require('./codenya/ttdownload'); 
 const { downloadVideo } = require('./codenya/tmate.js'); 
-const { tiktokDl } = require('./codenya/tikwm2');
+const { tiktokDl } = require('./codenya/tikwm2.js');
 const gemini = require('./codenya/gemini');
 
 const app = express();
