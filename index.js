@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware untuk mengizinkan CORS
 app.use(cors());
 app.use(express.json());
-Gemini');
+
 
 app.get('/debug', (req, res) => {
   res.json({
