@@ -14,7 +14,7 @@ app.use(express.json());
 
 
 app.use((req, res, next) => {
-  if (req.path === '/favicon.png') {
+  if (req.path === '/favicon.ico') {
     return res.status(204).end(); // Tidak mengembalikan konten
   }
   next();
