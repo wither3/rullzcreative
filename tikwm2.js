@@ -52,7 +52,7 @@ console.log(res);
   video: {
     noWatermark: `https://www.tikwm.com${res.play}`,
     watermark: `https://www.tikwm.com${res.wmplay}`,
-    videoHd: `htrps://www.tikwm.com${res.hdplay}`
+    videoHd: `https://www.tikwm.com${res.hdplay}`
   },
   noWMSize: res.size,
   WMSize: res.wm_size,
