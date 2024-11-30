@@ -95,9 +95,7 @@ app.get('/tmate/download', async (req, res) => {
 });
 
                          
-app.get('/favicon.png', (req, res) => {
-  res.sendFile(path.join(__dirname, 'favicon.png'));
-});
+
 
 // Menjalankan server
 app.listen(PORT, () => {
