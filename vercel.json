@@ -5,20 +5,11 @@
       "src": "index.js",
       "use": "@vercel/node"
     },
-    {
-      "src": "codenya/**",
-      "use": "@vercel/static"
-    }
   ],
   "routes": [
-    {
-      "src": "/codenya/(.*)",
-      "dest": "/codenya/$1"
-    },
     {
       "src": "/(.*)",
       "dest": "/index.js"
     }
-  ],
-  "ignoreCommand": "gitignore"
+  ]
 }
