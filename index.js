@@ -5,6 +5,7 @@ const { downloadVideo } = require('./codenya/tmate.js');
 const gemini = require('./codenya/gemini');
 const { tiktokDl } = require('./tikwm2.js');
 const aplMate = require('./codenya/apelmusik');
+const ytdl = require('@distube/ytdl-core');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -33,6 +34,26 @@ app.get('/debug', (req, res) => {
   });
 });
 
+
+app.get('/youtube/download', async (req, res) => {
+  const url = req.query.url; // URL diterima dari query parameter
+  
+  if (!url) {
+    return res.status(400).json({ success: false, message: 'URL is required' });
+  }
+
+  try {
+    const info = await ytdl.getInfo(url);
+    const formats = info.formats.map(format => ({
+      quality: format.qualityLabel || 'Unknown',
+      mimeType: format.mimeType,
+      url: format.url
+    }));
+    res.json({ success: true, formats });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
 
 app.get('/apelmusik/download', async (req, res) => {
     const url = req.query.url; // URL diambil dari query parameter
