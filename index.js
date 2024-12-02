@@ -162,7 +162,7 @@ app.get('/tmate/download', async (req, res) => {
 
 // Handler untuk rute yang tidak ditemukan
 app.use((req, res) => {
-  res.status(404).json({ error: 'Path not defined. Pastikan Anda menggunakan URL yang benar.' });
+  res.status(404).json({ error: 'berikut adalah path: /apelmusik/download?url= ,/tiktok/ ,/tmate ,/tikwm'});
 });
 
 // Menjalankan server
