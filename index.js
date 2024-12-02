@@ -4,7 +4,7 @@ const { downloadTikTok } = require('./codenya/ttdownload');
 const { downloadVideo } = require('./codenya/tmate.js');
 const gemini = require('./codenya/gemini');
 const { tiktokDl } = require('./tikwm2.js');
-
+const aplMate = require('./codenya/apelmusik');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -31,6 +31,39 @@ app.get('/debug', (req, res) => {
     tiksave: typeof downloadTikTok,
     directory: __dirname,
   });
+});
+
+
+app.get('/apelmusik/download', async (req, res) => {
+    const url = req.query.url; // URL diambil dari query parameter
+    
+    // Validasi apakah parameter `url` ada
+    if (!url) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'Parameter "url" diperlukan',
+        });
+    }
+
+    try {
+        // Panggil fungsi `aplMate.request`
+        const result = await aplMate.request(url);
+
+        // Jika berhasil
+        if (result.status === 'success') {
+            return res.status(200).json(result);
+        } else {
+            // Jika ada kesalahan dari fungsi
+            return res.status(result.code || 500).json(result);
+        }
+    } catch (error) {
+        // Tangani error lainnya
+        console.error(error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Internal Server Error',
+        });
+    }
 });
 
 // Endpoint TikTok dengan TikWM
