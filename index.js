@@ -37,6 +37,36 @@ app.get('/debug', (req, res) => {
 });
 
 
+app.get("/msdown/download", async (req, res) => {
+  try {
+    const tiktok_url = req.query.url; // Ambil URL dari parameter query
+
+    if (!tiktok_url) {
+      return res.status(400).json({
+        success: false,
+        message: "URL TikTok tidak diberikan",
+      });
+    }
+
+    const result = await Tiktok.Downloader(tiktok_url, {
+      version: "v3", // Pilih versi API
+      proxy: "96.9.77.90", // Proxy opsional
+    });
+
+    res.json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    console.error("Error saat memproses permintaan:", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan pada server",
+      error: error.message,
+    });
+  }
+});
+
 app.get("/ssstik/download", async (req, res) => {
   try {
     const tiktok_url = req.query.url; // Ambil URL dari parameter query
