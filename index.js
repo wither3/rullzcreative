@@ -7,8 +7,6 @@ const { tiktokDl } = require('./tikwm2.js');
 const aplMate = require('./codenya/apelmusik');
 const ytdl = require('@distube/ytdl-core');
 const Tiktok = require("@tobyg74/tiktok-api-dl");
-const { igdl } = require('btch-downloader');
-const { alldl } = require('rahad-all-downloader');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -38,30 +36,7 @@ app.get('/debug', (req, res) => {
   });
 });
 
-app.get('/instagram/download', async (req, res) => {
-  const url = req.query.url; // Ambil URL dari query string
-  if (!url) {
-    return res.status(400).json({ error: 'URL is required' });
-  }
 
-  try {
-    // Ambil data dari kedua library
-    const data = await igdl(url);
-    const result = await alldl(url);
-
-    // JSON output
-    const output = {
-      title: result?.data?.title || 'Unknown Title',
-      thumbnail: data[0]?.thumbnail || 'Thumbnail Tidak Ditemukan',
-      download: data[0]?.url || 'URL Download Tidak Ditemukan'
-    };
-
-    res.json(output); // Kirim hasil sebagai JSON
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to process the request' });
-  }
-});
 app.get("/msdown/download", async (req, res) => {
   try {
     const tiktok_url = req.query.url; // Ambil URL dari parameter query
