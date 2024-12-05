@@ -7,10 +7,13 @@ const { tiktokDl } = require('./tikwm2.js');
 const aplMate = require('./codenya/apelmusik');
 const ytdl = require('@distube/ytdl-core');
 const Tiktok = require("@tobyg74/tiktok-api-dl");
+const path = require('path');
+const { readFile, writeFile } = require('./utils/fileHandler');
+const { isDuplicate } = require('./utils/dataChecker');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
+const saveFilePath = path.join(__dirname, 'tiktok_downloads.json');
 // Middleware untuk mengizinkan CORS
 app.use(cors());
 app.use(express.json());
@@ -54,6 +57,54 @@ app.get('/ping', (req, res) => {
     responseTime: `${elapsedTimeMs} ms`,
   });
 });
+
+
+app.get('/tikwm/saved', (req, res) => {
+  try {
+    // Baca data yang disimpan
+    const savedData = readFile(saveFilePath);
+
+    if (savedData.length === 0) {
+      return res.json({
+        success: true,
+        message: 'Tidak ada data yang disimpan.',
+        data: [],
+      });
+    }
+
+    // Ambil query parameter 'page' (opsional)
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10; // Maksimal 10 hasil per halaman
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    // Ambil data sesuai halaman
+    const paginatedData = savedData.slice(startIndex, endIndex);
+
+    res.json({
+      success: true,
+      message: 'Data berhasil diambil.',
+      data: paginatedData,
+      pagination: {
+        currentPage: page,
+        totalItems: savedData.length,
+        totalPages: Math.ceil(savedData.length / limit),
+        hasNextPage: endIndex < savedData.length,
+        hasPreviousPage: startIndex > 0,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching saved data:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil data yang disimpan.',
+      error: error.message,
+    });
+  }
+});
+
+
+
 app.get("/msdown/download", async (req, res) => {
   try {
     const tiktok_url = req.query.url; // Ambil URL dari parameter query
@@ -172,12 +223,45 @@ app.get('/tikwm/download', async (req, res) => {
   if (!url) {
     return res.status(400).json({ error: 'URL TikTok harus disediakan dalam query parameter "url".' });
   }
+
   try {
+    const existingData = readFile(saveFilePath);
+
+    // Periksa apakah URL sudah ada
+    if (isDuplicate(existingData, url)) {
+      const existingResult = existingData.find((entry) => entry.result.url === url).result;
+      return res.json({
+        success: true,
+        message: 'Data sudah ada, tidak perlu disimpan ulang.',
+        data: existingResult,
+      });
+    }
+
+    // Fetch data baru jika URL unik
     const result = await tiktokDl(url);
-    res.json({ success: true, message: 'Data berhasil diunduh', data: result });
+    const newEntry = {
+      result: {
+        ...result,
+        url, // Tambahkan URL TikTok ke dalam result
+      },
+    };
+
+    // Simpan data baru
+    existingData.push(newEntry);
+    writeFile(saveFilePath, existingData);
+
+    res.json({
+      success: true,
+      message: 'Data berhasil diunduh dan disimpan.',
+      data: newEntry.result, // Hanya kirim result
+    });
   } catch (error) {
     console.error('Error TikWM:', error);
-    res.status(500).json({ success: false, message: 'Gagal mengunduh data TikTok', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Gagal mengunduh data TikTok',
+      error: error.message,
+    });
   }
 });
 
