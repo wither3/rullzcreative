@@ -341,18 +341,23 @@ async function readBlobData() {
 }
 
 // Fungsi untuk menulis data ke blob storage
+const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+
 async function writeBlobData(newData) {
   try {
-    // Format data untuk dikirim
+    console.log('Mencoba menyimpan data ke blob:', newData);
+
     const response = await axios.put(blobURL, JSON.stringify(newData), {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${blobToken}`, // Gunakan token di header
       },
     });
-    console.log('Blob updated successfully:', response.status);
+
+    console.log('Berhasil memperbarui blob:', response.status);
     return true;
   } catch (error) {
-    console.error('Error writing to blob:', error.message);
+    console.error('Gagal menulis ke blob:', error.message);
     return false;
   }
 }
