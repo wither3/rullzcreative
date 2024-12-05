@@ -9,6 +9,7 @@ const ytdl = require('@distube/ytdl-core');
 const Tiktok = require("@tobyg74/tiktok-api-dl");
 const path = require('path');
 
+const blobURL = 'https://pm6jctnwwrulrr4g.public.blob.vercel-storage.com/tiktok_downloads-OrvorNnYtEnL5kCvytTIBjT2W37SVi.json';
 const app = express();
 const PORT = process.env.PORT || 3000;
 const saveFilePath = path.join(__dirname, 'tiktok_downloads.json');
@@ -65,6 +66,7 @@ const savedData = [];
 // Endpoint untuk menyimpan data
 
 
+// Endpoint untuk menyimpan data TikTok
 app.get('/tikwm/download', async (req, res) => {
   const url = req.query.url;
   if (!url) {
@@ -72,68 +74,76 @@ app.get('/tikwm/download', async (req, res) => {
   }
 
   try {
-    const existingData = readFile(saveFilePath);
+    // Baca data dari blob storage
+    const existingData = await readBlobData();
 
     // Periksa apakah URL sudah ada
-    if (isDuplicate(existingData, url)) {
-      const existingResult = existingData.find((entry) => entry.result.url === url).result;
+    const isDuplicate = existingData.some((entry) => entry.url === url);
+    if (isDuplicate) {
+      const existingEntry = existingData.find((entry) => entry.url === url);
       return res.json({
         success: true,
         message: 'Data sudah ada, tidak perlu disimpan ulang.',
-        data: existingResult,
+        data: existingEntry.result,
       });
     }
 
     // Fetch data baru jika URL unik
-    const result = await tiktokDl(url);
-    const newEntry = {
-      result: {
-        ...result,
-        url, // Tambahkan URL TikTok ke dalam result
-      },
-    };
+    const result = await tiktokDl(url); // Fungsi fetch data TikTok (mock)
+    const newEntry = { url, result };
 
-    // Simpan data baru
+    // Simpan data baru ke blob
     existingData.push(newEntry);
-    writeFile(saveFilePath, existingData);
+    const isSaved = await writeBlobData(existingData);
 
-    res.json({
-      success: true,
-      message: 'Data berhasil diunduh dan disimpan.',
-      data: newEntry.result, // Hanya kirim result
-    });
+    if (isSaved) {
+      res.json({
+        success: true,
+        message: 'Data berhasil diunduh dan disimpan.',
+        data: result,
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: 'Gagal menyimpan data ke blob storage',
+      });
+    }
   } catch (error) {
-    console.error('Error TikWM:', error);
+    console.error('Error TikWM:', error.message);
     res.status(500).json({
       success: false,
-      message: 'Gagal mengunduh data TikTok',
+      message: 'Gagal mengunduh atau menyimpan data TikTok',
       error: error.message,
     });
   }
 });
 
-// Endpoint untuk melihat semua data
-app.get('/tikwm/saved', (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = 10;
-  const startIndex = (page - 1) * limit;
-  const endIndex = page * limit;
+// Endpoint untuk melihat semua data yang disimpan
+app.get('/tikwm/data', async (req, res) => {
+  try {
+    // Baca data dari blob storage
+    const data = await readBlobData();
+    const limit = parseInt(req.query.limit, 10) || 10; // Default maksimal 10
+    const limitedData = data.slice(0, limit);
 
-  const paginatedData = savedData.slice(startIndex, endIndex);
-
-  res.json({
-    success: true,
-    message: 'Data berhasil diambil.',
-    data: paginatedData,
-    pagination: {
-      currentPage: page,
-      totalItems: savedData.length,
-      totalPages: Math.ceil(savedData.length / limit),
-      hasNextPage: endIndex < savedData.length,
-      hasPreviousPage: startIndex > 0,
-    },
-  });
+    res.json({
+      success: true,
+      message: `Menampilkan ${limitedData.length} data dari blob storage`,
+      data: limitedData,
+    });
+  } catch (error) {
+    console.error('Error fetching data:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil data dari blob storage',
+      error: error.message,
+    });
+  }
 });
+
+
+// Endpoint untuk melihat semua data
+
 
 
 app.get("/msdown/download", async (req, res) => {
@@ -314,30 +324,38 @@ app.use((req, res) => {
   res.status(404).json({ error: 'berikut adalah path: /apelmusik/download?url= ,/tiktok/ ,/tmate ,/tikwm'});
 });
 
-function readFile(filePath) {
-  try {
-    if (!fs.existsSync(filePath)) return [];
-    const data = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(data || '[]');
-  } catch (error) {
-    console.error('Error reading file:', error);
-    return [];
-  }
-}
+
 
 // Fungsi untuk menulis file JSON
-function writeFile(filePath, data) {
+
+// Fungsi untuk membaca file dari blob storage
+async function readBlobData() {
   try {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+    const response = await axios.get(blobURL);
+    return response.data; // Mengembalikan isi file
   } catch (error) {
-    console.error('Error writing file:', error);
+    console.error('Error reading blob data:', error.message);
+    return []; // Kembalikan array kosong jika gagal
   }
 }
 
-// Fungsi untuk memeriksa duplikasi
-function isDuplicate(data, url) {
-  return data.some((entry) => entry.result.url === url);
+// Fungsi untuk menulis data ke blob storage
+async function writeBlobData(newData) {
+  try {
+    // Format data untuk dikirim
+    const response = await axios.put(blobURL, JSON.stringify(newData), {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    console.log('Blob updated successfully:', response.status);
+    return true;
+  } catch (error) {
+    console.error('Error writing to blob:', error.message);
+    return false;
+  }
 }
+
 
 // Menjalankan server
 app.listen(PORT, () => {
