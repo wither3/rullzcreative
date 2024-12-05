@@ -65,27 +65,53 @@ app.get('/ping', (req, res) => {
 const savedData = [];
 
 // Endpoint untuk menyimpan data
-app.post('/tikwm/download', async (req, res) => {
-  const { url, result } = req.body;
 
-  // Cek apakah data dengan URL ini sudah ada
-  const existing = savedData.find((item) => item.result.url === url);
 
-  if (existing) {
-    return res.json({
-      success: true,
-      message: 'Data sudah ada, tidak perlu disimpan ulang.',
-      data: existing,
-    });
+app.get('/tikwm/download', async (req, res) => {
+  const url = req.query.url;
+  if (!url) {
+    return res.status(400).json({ error: 'URL TikTok harus disediakan dalam query parameter "url".' });
   }
 
-  // Simpan data baru
-  savedData.push({ result });
-  res.json({
-    success: true,
-    message: 'Data berhasil diunduh dan disimpan.',
-    data: { result },
-  });
+  try {
+    const existingData = readFile(saveFilePath);
+
+    // Periksa apakah URL sudah ada
+    if (isDuplicate(existingData, url)) {
+      const existingResult = existingData.find((entry) => entry.result.url === url).result;
+      return res.json({
+        success: true,
+        message: 'Data sudah ada, tidak perlu disimpan ulang.',
+        data: existingResult,
+      });
+    }
+
+    // Fetch data baru jika URL unik
+    const result = await tiktokDl(url);
+    const newEntry = {
+      result: {
+        ...result,
+        url, // Tambahkan URL TikTok ke dalam result
+      },
+    };
+
+    // Simpan data baru
+    existingData.push(newEntry);
+    writeFile(saveFilePath, existingData);
+
+    res.json({
+      success: true,
+      message: 'Data berhasil diunduh dan disimpan.',
+      data: newEntry.result, // Hanya kirim result
+    });
+  } catch (error) {
+    console.error('Error TikWM:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Gagal mengunduh data TikTok',
+      error: error.message,
+    });
+  }
 });
 
 // Endpoint untuk melihat semua data
@@ -290,6 +316,33 @@ app.use((req, res) => {
   res.status(404).json({ error: 'berikut adalah path: /apelmusik/download?url= ,/tiktok/ ,/tmate ,/tikwm'});
 });
 
+function readFile(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return [];
+    const data = fs.readFileSync(filePath, 'utf8');
+    return JSON.parse(data || '[]');
+  } catch (error) {
+    console.error('Error reading file:', error);
+    return [];
+  }
+}
+
+// Fungsi untuk menulis file JSON
+function writeFile(filePath, data) {
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Error writing file:', error);
+  }
+}
+
+// Fungsi untuk memeriksa duplikasi
+function isDuplicate(data, url) {
+  return data.some((entry) => entry.result.url === url);
+}
+function isDuplicate(data, url) {
+  return data.some((entry) => entry.result.url === url);
+}
 // Menjalankan server
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);
