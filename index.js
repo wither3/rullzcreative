@@ -8,8 +8,6 @@ const aplMate = require('./codenya/apelmusik');
 const ytdl = require('@distube/ytdl-core');
 const Tiktok = require("@tobyg74/tiktok-api-dl");
 const path = require('path');
-const { writeFile } = require('./utils/fileHandler');
-const { isDuplicate } = require('./utils/dataChecker');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
