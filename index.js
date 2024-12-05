@@ -36,7 +36,24 @@ app.get('/debug', (req, res) => {
   });
 });
 
+app.get('/ping', (req, res) => {
+  // Catat waktu sebelum mulai proses
+  const startTime = process.hrtime();
 
+  // Simulasikan proses API (jika ada proses lain, tambahkan di sini)
+  const result = { message: 'API is working fine' };
+
+  // Hitung waktu setelah proses selesai
+  const [seconds, nanoseconds] = process.hrtime(startTime);
+  const elapsedTimeMs = (seconds * 1000 + nanoseconds / 1e6).toFixed(3); // Waktu dalam ms
+
+  // Kirim respons dengan waktu eksekusi
+  res.json({
+    status: 'success',
+    result,
+    responseTime: `${elapsedTimeMs} ms`,
+  });
+});
 app.get("/msdown/download", async (req, res) => {
   try {
     const tiktok_url = req.query.url; // Ambil URL dari parameter query
