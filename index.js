@@ -8,7 +8,7 @@ const aplMate = require('./codenya/apelmusik');
 const ytdl = require('@distube/ytdl-core');
 const Tiktok = require("@tobyg74/tiktok-api-dl");
 const path = require('path');
-const { readFile, writeFile } = require('./utils/fileHandler');
+const { writeFile } = require('./utils/fileHandler');
 const { isDuplicate } = require('./utils/dataChecker');
 
 const app = express();
