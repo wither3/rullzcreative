@@ -340,9 +340,7 @@ function writeFile(filePath, data) {
 function isDuplicate(data, url) {
   return data.some((entry) => entry.result.url === url);
 }
-function isDuplicate(data, url) {
-  return data.some((entry) => entry.result.url === url);
-}
+
 // Menjalankan server
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);
