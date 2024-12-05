@@ -12,6 +12,8 @@
     "tikwm2": "file:./codenya/tikwm2.js",
     "gemini": "file:./codenya/gemini.js",
     "@distube/ytdl-core": "^4.15.1",
-    "@tobyg74/tiktok-api-dl": "^1.2.1"
+    "@tobyg74/tiktok-api-dl": "^1.2.1",
+    "rahad-all-downloader": "^2.1.17",
+    "btch-downloader": "^2.8.2"
   }
 }
