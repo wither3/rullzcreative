@@ -384,7 +384,6 @@ async function readBlobData() {
 }
 
 // Fungsi untuk menulis data ke blob storage
-const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
 
 async function writeBlobData(newData) {
   try {
