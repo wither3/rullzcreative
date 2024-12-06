@@ -11,7 +11,7 @@ const path = require('path');
 const axios = require('axios');
 
 const blobURL = 'https://pm6jctnwwrulrr4g.public.blob.vercel-storage.com/tiktok_downloads-dC42MVKaPuFrsE8Ey4NztLqXnlHppm.json';
-const blobToken = 'vercel_blob_rw_Pm6JCtNWWrULrr4G_UxqFHPb1bHl6q92AF9QtSrzZmcqON3';
+const blobToken = 'BLOB_READ_WRITE_TOKEN';
 const app = express();
 const PORT = process.env.PORT || 3000;
 const saveFilePath = path.join(__dirname, 'tiktok_downloads.json');
