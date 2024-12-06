@@ -10,7 +10,8 @@ const Tiktok = require("@tobyg74/tiktok-api-dl");
 const path = require('path');
 const axios = require('axios');
 
-const blobURL = 'https://pm6jctnwwrulrr4g.public.blob.vercel-storage.com/tiktok_downloads-OrvorNnYtEnL5kCvytTIBjT2W37SVi.json';
+const blobURL = 'https://pm6jctnwwrulrr4g.public.blob.vercel-storage.com/tiktok_downloads-dC42MVKaPuFrsE8Ey4NztLqXnlHppm.json';
+const blobToken = 'vercel_blob_rw_Pm6JCtNWWrULrr4G_UxqFHPb1bHl6q92AF9QtSrzZmcqON3';
 const app = express();
 const PORT = process.env.PORT || 3000;
 const saveFilePath = path.join(__dirname, 'tiktok_downloads.json');
@@ -39,6 +40,48 @@ app.get('/debug', (req, res) => {
   });
 });
 
+
+app.get('/blob/edit', async (req, res) => {
+  try {
+    // 1. Ambil data dari blob URL
+    const response = await axios.get(blobURL);
+    let data = response.data;
+
+    // 2. Tambahkan teks baru ke data JSON
+    const newText = "dkckfkdkdk berhasil di edit";
+    if (!data.texts) data.texts = []; // Jika array `texts` belum ada
+    data.texts.push(newText); // Tambahkan teks baru
+
+    // 3. Simpan data yang telah diedit ke blob
+    const updateResponse = await axios.put(blobURL, JSON.stringify(data), {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${blobToken}`, // Token read-write
+      },
+    });
+
+    // 4. Kirim respons berhasil
+    if (updateResponse.status === 200) {
+      res.json({
+        success: true,
+        message: 'File berhasil diedit',
+        updatedData: data,
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: 'Gagal menyimpan file ke blob storage',
+      });
+    }
+  } catch (error) {
+    console.error('Error editing blob file:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan saat mengedit file',
+      error: error.message,
+    });
+  }
+});
 app.get('/ping', (req, res) => {
   // Catat waktu sebelum mulai proses
   const startTime = process.hrtime();
