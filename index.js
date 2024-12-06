@@ -40,27 +40,29 @@ app.get('/debug', (req, res) => {
   });
 });
 
-
 app.get('/blob/edit', async (req, res) => {
+  console.log('Memasuki rute /blob/edit');
   try {
-    // 1. Ambil data dari blob URL
     const response = await axios.get(blobURL);
     let data = response.data;
 
-    // 2. Tambahkan teks baru ke data JSON
-    const newText = "dkckfkdkdk berhasil di edit";
-    if (!data.texts) data.texts = []; // Jika array `texts` belum ada
-    data.texts.push(newText); // Tambahkan teks baru
+    console.log('Data yang diambil:', data);
 
-    // 3. Simpan data yang telah diedit ke blob
+    const newText = "dkckfkdkdk berhasil di edit";
+    if (!data.texts) data.texts = [];
+    data.texts.push(newText);
+
+    console.log('Data yang akan disimpan:', data);
+
     const updateResponse = await axios.put(blobURL, JSON.stringify(data), {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${blobToken}`, // Token read-write
+        Authorization: `Bearer ${blobToken}`,
       },
     });
 
-    // 4. Kirim respons berhasil
+    console.log('Status penyimpanan:', updateResponse.status);
+
     if (updateResponse.status === 200) {
       res.json({
         success: true,
@@ -82,6 +84,9 @@ app.get('/blob/edit', async (req, res) => {
     });
   }
 });
+
+
+
 app.get('/ping', (req, res) => {
   // Catat waktu sebelum mulai proses
   const startTime = process.hrtime();
