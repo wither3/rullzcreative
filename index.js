@@ -116,56 +116,29 @@ const savedData = [];
 
 
 // Endpoint untuk menyimpan data TikTok
+
 app.get('/tikwm/download', async (req, res) => {
-  const url = req.query.url;
-  if (!url) {
-    return res.status(400).json({ error: 'URL TikTok harus disediakan dalam query parameter "url".' });
-  }
-
   try {
-    // Baca data dari blob storage
-    const existingData = await readBlobData();
-
-    // Periksa apakah URL sudah ada
-    const isDuplicate = existingData.some((entry) => entry.url === url);
-    if (isDuplicate) {
-      const existingEntry = existingData.find((entry) => entry.url === url);
-      return res.json({
-        success: true,
-        message: 'Data sudah ada, tidak perlu disimpan ulang.',
-        data: existingEntry.result,
-      });
+    const url = req.query.url; // Ambil URL dari query parameter
+    if (!url) {
+      return res.status(400).json({ error: 'URL TikTok harus diberikan dalam parameter "url".' });
     }
 
-    // Fetch data baru jika URL unik
-    const result = await tiktokDl(url); // Fungsi fetch data TikTok (mock)
-    const newEntry = { url, result };
+    console.log('Mengunduh data TikTok untuk URL:', url);
 
-    // Simpan data baru ke blob
-    existingData.push(newEntry);
-    const isSaved = await writeBlobData(existingData);
-
-    if (isSaved) {
-      res.json({
-        success: true,
-        message: 'Data berhasil diunduh dan disimpan.',
-        data: result,
-      });
+    const tikDlData = await tiktokDl(url);
+    if (tikDlData) {
+      console.log('Berhasil mendapatkan data TikTok:', tikDlData);
+      return res.status(200).json({ success: true, data: tikDlData });
     } else {
-      res.status(500).json({
-        success: false,
-        message: 'Gagal menyimpan data ke blob storage',
-      });
+      return res.status(404).json({ error: 'Tidak ada data yang ditemukan untuk URL yang diberikan.' });
     }
   } catch (error) {
-    console.error('Error TikWM:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Gagal mengunduh atau menyimpan data TikTok',
-      error: error.message,
-    });
+    console.error('Kesalahan saat mengunduh data TikTok:', error.message);
+    return res.status(500).json({ error: 'Terjadi kesalahan internal server.', detail: error.message });
   }
 });
+    
 
 // Endpoint untuk melihat semua data yang disimpan
 app.get('/tikwm/data', async (req, res) => {
