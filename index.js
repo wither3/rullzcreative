@@ -48,104 +48,30 @@ app.get('/debug', (req, res) => {
 
 
 
-app.get('/tikdl/download', async (req, res) => {
-  const randomApiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
-  console.log(`API yang digunakan:`, randomApiKey);
 
+
+
+
+    
+app.get('/api/tikdl', async (req, res) => {
   try {
-    const url = req.query.url;
+    // Ambil URL dari query parameter
+    const { url } = req.query;
+
     if (!url) {
-      res.status(400).send({ error: 'URL tidak ditemukan' });
-      return;
+      return res.status(400).json({ error: 'URL TikTok tidak disertakan.' });
     }
 
-    const info = await tiktokInfo(url, randomApiKey);
-    res.json(info);
+    // Panggil fungsi utama untuk mendapatkan informasi TikTok
+    const result = await tiktokMain(url);
+
+    // Kirim hasil sebagai respons JSON
+    res.status(200).json(result);
   } catch (err) {
-    console.error(err);
-    res.status(500).send({ error: 'Gagal mendapatkan data' });
+    console.error('Error:', err.message);
+    res.status(500).json({ error: 'Terjadi kesalahan pada server.', details: err.message });
   }
 });
-
-async function tiktokInfo(url, apikey) {
-  const options = {
-    method: 'POST',
-    hostname: 'tiktok-media-no-watermark.p.rapidapi.com',
-    port: null,
-    path: '/v1/social/tiktok/detail/url',
-    headers: {
-      'x-rapidapi-key': randomApiKey,
-      'x-rapidapi-host': 'tiktok-media-no-watermark.p.rapidapi.com',
-      'Content-Type': 'application/json'
-    }
-  };
-
-  return new Promise((resolve, reject) => {
-    const req = https.request(options, (res) => {
-      const chunks = [];
-
-      res.on('data', (chunk) => {
-        chunks.push(chunk);
-      });
-
-      res.on('end', () => {
-        const body = Buffer.concat(chunks);
-        const data = JSON.parse(body.toString());
-        resolve(data);
-      });
-    });
-
-    req.on('error', (err) => {
-      reject(err);
-    });
-
-    req.write(JSON.stringify({ url }));
-    req.end();
-  });
-}
-
-async function prosesData(data) {
-  const timestamp = data.aweme_detail.create_time;
-  const tanggal = new Date(timestamp * 1000);
-  const tahun = tanggal.getFullYear();
-  const bulan = tanggal.getMonth() + 1;
-  const hari = tanggal.getDate();
-  const jam = tanggal.getHours();
-  const menit = tanggal.getMinutes();
-  const detik = tanggal.getSeconds();
-
-  const hasilnya = {
-    videoId: data.aweme_detail.aweme_id,
-    authorId: data.aweme_detail.author_user_id,
-    author: data.aweme_detail.author.unique_id,
-    nickname: data.aweme_detail.author.nickname,
-    region: data.aweme_detail.region,
-    title: data.aweme_detail.desc,
-    createTime: `${tahun}-${bulan.toString().padStart(2, '0')}-${hari.toString().padStart(2, '0')} ${jam.toString().padStart(2, '0')}:${menit.toString().padStart(2, '0')}:${detik.toString().padStart(2, '0')}`,
-    avatar: data.aweme_detail.author.avatar_larger.url_list[0],
-    videoInfo: {
-      view: data.aweme_detail.statistics.play_count,
-      like: data.aweme_detail.statistics.digg_count,
-      comment: data.aweme_detail.statistics.comment_count,
-      share: data.aweme_detail.statistics.share_count,
-      favorit: data.aweme_detail.statistics.collect_count,
-      repost: data.aweme_detail.statistics.repost_count,
-      shareWA: data.aweme_detail.statistics.whatsapp_share_count,
-    },
-    video: {
-      size: data.aweme_detail.video.play_addr_h264.data_size,
-      link: data.aweme_detail.video.play_addr_h264.url_list[2],
-    },
-    mp3: {
-      author: data.aweme_detail.music.author,
-      cover: data.aweme_detail.music.cover_large.url_list[0],
-      title: data.aweme_detail.music.title,
-      link: data.aweme_detail.music.play_url.url_list[0],
-    },
-  };
-
-  return hasilnya;
-}
 
 
 app.get('/blob/edit', async (req, res) => {
