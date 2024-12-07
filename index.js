@@ -9,7 +9,11 @@ const ytdl = require('@distube/ytdl-core');
 const Tiktok = require("@tobyg74/tiktok-api-dl");
 const path = require('path');
 const axios = require('axios');
+const https = require('https');
 
+const apikey = `afba42893fmsha63e4a70440e54dp1d25a3jsn2511b8314ddb`;
+const apikey2 = `44114406bbmshdee24010b885bc0p140418jsn3d9caf51b4b3`;
+const apikey3 = `2d8efbca6cmshba7782a3d1b31bcp160901jsn1b8edec486b4`;
 const blobURL = 'https://pm6jctnwwrulrr4g.public.blob.vercel-storage.com/tiktok_downloads-dC42MVKaPuFrsE8Ey4NztLqXnlHppm.json';
 const blobToken = 'BLOB_READ_WRITE_TOKEN';
 const app = express();
@@ -39,6 +43,62 @@ app.get('/debug', (req, res) => {
     directory: __dirname,
   });
 });
+
+app.get('/tikdl/download', async (req, res) => {
+  const randomApiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
+  console.log(`API yang digunakan:`, randomApiKey);
+
+  try {
+    const url = req.query.url;
+    if (!url) {
+      res.status(400).send({ error: 'URL tidak ditemukan' });
+      return;
+    }
+
+    const info = await tiktokInfo(url, randomApiKey);
+    res.json(info);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ error: 'Gagal mendapatkan data' });
+  }
+});
+
+async function tiktokInfo(url, apikey) {
+  const options = {
+    method: 'POST',
+    hostname: 'tiktok-media-no-watermark.p.rapidapi.com',
+    port: null,
+    path: '/v1/social/tiktok/detail/url',
+    headers: {
+      'x-rapidapi-key': apikey,
+      'x-rapidapi-host': 'tiktok-media-no-watermark.p.rapidapi.com',
+      'Content-Type': 'application/json'
+    }
+  };
+
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      const chunks = [];
+
+      res.on('data', (chunk) => {
+        chunks.push(chunk);
+      });
+
+      res.on('end', () => {
+        const body = Buffer.concat(chunks);
+        const data = JSON.parse(body.toString());
+        resolve(data);
+      });
+    });
+
+    req.on('error', (err) => {
+      reject(err);
+    });
+
+    req.write(JSON.stringify({ url }));
+    req.end();
+  });
+}
 
 app.get('/blob/edit', async (req, res) => {
   console.log('Memasuki rute /blob/edit');
