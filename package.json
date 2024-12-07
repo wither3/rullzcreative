@@ -8,6 +8,7 @@
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "path": "^0.12.7",
+    "https": "^1.0.0",
     "qs": "^6.13.1",
     "form-data": "^4.0.1",
     "tikwm2": "file:./codenya/tikwm2.js",
