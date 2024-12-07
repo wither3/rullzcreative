@@ -15,6 +15,8 @@ const apikey = `afba42893fmsha63e4a70440e54dp1d25a3jsn2511b8314ddb`;
 const apikey2 = `44114406bbmshdee24010b885bc0p140418jsn3d9caf51b4b3`;
 const apikey3 = `2d8efbca6cmshba7782a3d1b31bcp160901jsn1b8edec486b4`;
 const blobURL = 'https://pm6jctnwwrulrr4g.public.blob.vercel-storage.com/tiktok_downloads-dC42MVKaPuFrsE8Ey4NztLqXnlHppm.json';
+const apiKeys = [apikey, apikey2, apikey3];
+
 const blobToken = 'BLOB_READ_WRITE_TOKEN';
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,6 +46,8 @@ app.get('/debug', (req, res) => {
   });
 });
 
+
+
 app.get('/tikdl/download', async (req, res) => {
   const randomApiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
   console.log(`API yang digunakan:`, randomApiKey);
@@ -70,7 +74,7 @@ async function tiktokInfo(url, apikey) {
     port: null,
     path: '/v1/social/tiktok/detail/url',
     headers: {
-      'x-rapidapi-key': apikey,
+      'x-rapidapi-key': randomApiKey,
       'x-rapidapi-host': 'tiktok-media-no-watermark.p.rapidapi.com',
       'Content-Type': 'application/json'
     }
@@ -99,6 +103,50 @@ async function tiktokInfo(url, apikey) {
     req.end();
   });
 }
+
+async function prosesData(data) {
+  const timestamp = data.aweme_detail.create_time;
+  const tanggal = new Date(timestamp * 1000);
+  const tahun = tanggal.getFullYear();
+  const bulan = tanggal.getMonth() + 1;
+  const hari = tanggal.getDate();
+  const jam = tanggal.getHours();
+  const menit = tanggal.getMinutes();
+  const detik = tanggal.getSeconds();
+
+  const hasilnya = {
+    videoId: data.aweme_detail.aweme_id,
+    authorId: data.aweme_detail.author_user_id,
+    author: data.aweme_detail.author.unique_id,
+    nickname: data.aweme_detail.author.nickname,
+    region: data.aweme_detail.region,
+    title: data.aweme_detail.desc,
+    createTime: `${tahun}-${bulan.toString().padStart(2, '0')}-${hari.toString().padStart(2, '0')} ${jam.toString().padStart(2, '0')}:${menit.toString().padStart(2, '0')}:${detik.toString().padStart(2, '0')}`,
+    avatar: data.aweme_detail.author.avatar_larger.url_list[0],
+    videoInfo: {
+      view: data.aweme_detail.statistics.play_count,
+      like: data.aweme_detail.statistics.digg_count,
+      comment: data.aweme_detail.statistics.comment_count,
+      share: data.aweme_detail.statistics.share_count,
+      favorit: data.aweme_detail.statistics.collect_count,
+      repost: data.aweme_detail.statistics.repost_count,
+      shareWA: data.aweme_detail.statistics.whatsapp_share_count,
+    },
+    video: {
+      size: data.aweme_detail.video.play_addr_h264.data_size,
+      link: data.aweme_detail.video.play_addr_h264.url_list[2],
+    },
+    mp3: {
+      author: data.aweme_detail.music.author,
+      cover: data.aweme_detail.music.cover_large.url_list[0],
+      title: data.aweme_detail.music.title,
+      link: data.aweme_detail.music.play_url.url_list[0],
+    },
+  };
+
+  return hasilnya;
+}
+
 
 app.get('/blob/edit', async (req, res) => {
   console.log('Memasuki rute /blob/edit');
