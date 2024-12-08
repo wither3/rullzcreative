@@ -10,6 +10,7 @@ const Tiktok = require("@tobyg74/tiktok-api-dl");
 const path = require('path');
 const axios = require('axios');
 const https = require('https');
+const sqlite3 = require('sqlite3').verbose();
 const tiktokMain = require('./codenya/tiktokk');
 
 const apikey = `afba42893fmsha63e4a70440e54dp1d25a3jsn2511b8314ddb`;
@@ -157,8 +158,7 @@ const savedData = [];
 // Endpoint untuk menyimpan data TikTok
 
 app.get('/tikwm/download', async (req, res) => {
-  const sqlite3 = require('sqlite3').verbose();
-    try {
+      try {
     const url = req.query.url; // Ambil URL dari query parameter
     if (!url) {
       return res.status(400).json({ error: 'URL TikTok harus diberikan dalam parameter "url".' });
