@@ -34,7 +34,7 @@ app.use((req, res, next) => {
   console.log(`Request received: ${req.method} ${req.path}`); // Log semua permintaan
   next();
 });
-
+const db = new sqlite3.Database(':memory:'); // Atau gunakan file DB untuk persistensi
 db.serialize(() => {
   db.run('CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY, message TEXT, timestamp TEXT)');
 });
@@ -158,8 +158,7 @@ const savedData = [];
 
 app.get('/tikwm/download', async (req, res) => {
   const sqlite3 = require('sqlite3').verbose();
-  const db = new sqlite3.Database(':memory:'); // Atau gunakan file DB untuk persistensi
-  try {
+    try {
     const url = req.query.url; // Ambil URL dari query parameter
     if (!url) {
       return res.status(400).json({ error: 'URL TikTok harus diberikan dalam parameter "url".' });
