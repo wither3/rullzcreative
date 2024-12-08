@@ -56,7 +56,15 @@ app.get('/debug', (req, res) => {
 
 
 
-
+app.get('/read-json', (req, res) => {
+  db.all('SELECT * FROM messages', (err, rows) => {
+    if (err) {
+      console.error('Error:', err);
+      return res.status(500).json({ success: false, message: 'Gagal membaca data.' });
+    }
+    res.status(200).json({ success: true, data: rows });
+  });
+});
 
     
 app.get('/api/tikdl', async (req, res) => {
