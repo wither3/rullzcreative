@@ -36,9 +36,7 @@ app.use((req, res, next) => {
   next();
 });
 const db = new sqlite3.Database(':memory:'); // Atau gunakan file DB untuk persistensi
-db.serialize(() => {
-  db.run('CREATE TABLE IF NOT EXISTS hasil (id INTEGER PRIMARY KEY, message TEXT, timestamp TEXT)');
-});
+
 
 // Endpoint Debugging
 app.get('/debug', (req, res) => {
@@ -56,15 +54,7 @@ app.get('/debug', (req, res) => {
 
 
 
-app.get('/read-json', (req, res) => {
-  db.all('SELECT * FROM hasil', (err, rows) => {
-    if (err) {
-      console.error('Error:', err);
-      return res.status(500).json({ success: false, message: 'Gagal membaca data.' });
-    }
-    res.status(200).json({ success: true, data: rows });
-  });
-});
+
 
     
 app.get('/api/tikdl', async (req, res) => {
@@ -89,7 +79,46 @@ app.get('/api/tikdl', async (req, res) => {
 
 
 
-    
+db.serialize(() => {
+  db.run('CREATE TABLE IF NOT EXISTS hasil (id INTEGER PRIMARY KEY, message TEXT, timestamp TEXT)');
+});
+
+app.get('/tikwm/download', async (req, res) => {
+  try {
+    const url = req.query.url;
+    if (!url) {
+      return res.status(400).json({ error: 'URL TikTok harus diberikan dalam parameter "url".' });
+    }
+
+    const tikDlData = await tiktokDl(url);
+    if (tikDlData) {
+      const timestamp = new Date().toISOString();
+      db.run('INSERT INTO hasil (message, timestamp) VALUES (?, ?)', [tikDlData, timestamp], function (err) {
+        if (err) {
+          console.error('Error menyimpan data:', err);
+          return res.status(500).json({ success: false, message: 'Gagal menyimpan data.' });
+        }
+        console.log('Berhasil menyimpan data ke database.');
+        return res.status(200).json({ success: true, data: tikDlData });
+      });
+    } else {
+      return res.status(404).json({ error: 'Tidak ada data yang ditemukan untuk URL yang diberikan.' });
+    }
+  } catch (error) {
+    console.error('Kesalahan saat mengunduh data TikTok:', error.message);
+    return res.status(500).json({ error: 'Terjadi kesalahan internal server.', detail: error.message });
+  }
+});
+
+app.get('/read-json', (req, res) => {
+  db.all('SELECT * FROM hasil', (err, rows) => {
+    if (err) {
+      console.error('Error:', err);
+      return res.status(500).json({ success: false, message: 'Gagal membaca data.' });
+    }
+    res.status(200).json({ success: true, data: rows });
+  });
+});    
   
 
 
@@ -116,72 +145,10 @@ app.get('/ping', (req, res) => {
 
 
 // Data di memori
-const savedData = [];
 
-// Endpoint untuk menyimpan data
-
-
-// Endpoint untuk menyimpan data TikTok
-
-app.get('/tikwm/download', async (req, res) => {
-  try {
-    const url = req.query.url; // Ambil URL dari query parameter
-    if (!url) {
-      return res.status(400).json({ error: 'URL TikTok harus diberikan dalam parameter "url".' });
-    }
-
-    console.log('Mengunduh data TikTok untuk URL:', url);
-
-    const tikDlData = await tiktokDl(url);
-    if (tikDlData) {
-      console.log('Berhasil mendapatkan data TikTok:', tikDlData);
-
-      // Simpan data ke database
-      const timestamp = new Date().toISOString();
-      db.run('INSERT INTO hasil (message, timestamp) VALUES (?, ?)', [tikDlData, timestamp], function (err) {
-        if (err) {
-          console.error('Error menyimpan data:', err);
-          return res.status(500).json({ success: false, message: 'Gagal menyimpan data.' });
-        }
-        console.log('Berhasil menyimpan data ke database.');
-        return res.status(200).json({ success: true, data: tikDlData });
-      });
-    } else {
-      return res.status(404).json({ error: 'Tidak ada data yang ditemukan untuk URL yang diberikan.' });
-    }
-  } catch (error) {
-    console.error('Kesalahan saat mengunduh data TikTok:', error.message);
-    return res.status(500).json({ error: 'Terjadi kesalahan internal server.', detail: error.message });
-  }
-});
     
 
 // Endpoint untuk melihat semua data yang disimpan
-app.get('/tikwm/data', async (req, res) => {
-  try {
-    // Baca data dari blob storage
-    const data = await readBlobData();
-    const limit = parseInt(req.query.limit, 10) || 10; // Default maksimal 10
-    const limitedData = data.slice(0, limit);
-
-    res.json({
-      success: true,
-      message: `Menampilkan ${limitedData.length} data dari blob storage`,
-      data: limitedData,
-    });
-  } catch (error) {
-    console.error('Error fetching data:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Gagal mengambil data dari blob storage',
-      error: error.message,
-    });
-  }
-});
-
-
-// Endpoint untuk melihat semua data
-
 
 
 app.get("/msdown/download", async (req, res) => {
