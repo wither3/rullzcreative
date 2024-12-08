@@ -294,7 +294,9 @@ const negaranya = countries[negara];
       },
       video: {
         size: info.aweme_detail.video.play_addr_h264.data_size,
-        link: info.aweme_detail.video.play_addr_h264.url_list[2]
+        link: info.aweme_detail.video.play_addr_h264.url_list[2],
+        link2:info.aweme_detail.video.play_addr_h264.url_list[1],
+    link3: info.aweme_detail.video.play_addr_h264.url_list[2]
       },
       mp3: {
         author: info.aweme_detail.music.author,
