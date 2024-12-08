@@ -35,6 +35,10 @@ app.use((req, res, next) => {
   next();
 });
 
+db.serialize(() => {
+  db.run('CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY, message TEXT, timestamp TEXT)');
+});
+
 // Endpoint Debugging
 app.get('/debug', (req, res) => {
   res.json({
@@ -153,6 +157,8 @@ const savedData = [];
 // Endpoint untuk menyimpan data TikTok
 
 app.get('/tikwm/download', async (req, res) => {
+  const sqlite3 = require('sqlite3').verbose();
+  const db = new sqlite3.Database(':memory:'); // Atau gunakan file DB untuk persistensi
   try {
     const url = req.query.url; // Ambil URL dari query parameter
     if (!url) {
@@ -165,6 +171,14 @@ app.get('/tikwm/download', async (req, res) => {
     if (tikDlData) {
       console.log('Berhasil mendapatkan data TikTok:', tikDlData);
       return res.status(200).json({ success: true, data: tikDlData });
+      const timestamp = new Date().toISOString();
+  db.run('INSERT INTO messages (message, timestamp) VALUES (?, ?)', [tikDlData, timestamp], function (err) {
+    if (err) {
+      console.error('Error:', err);
+      return res.status(500).json({ success: false, message: 'Gagal menyimpan data.' });
+    }
+    res.status(200).json({ success: true, message: 'Data berhasil ditambahkan.', id: this.lastID });
+  });
     } else {
       return res.status(404).json({ error: 'Tidak ada data yang ditemukan untuk URL yang diberikan.' });
     }
