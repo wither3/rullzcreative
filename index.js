@@ -57,7 +57,7 @@ app.get('/debug', (req, res) => {
 
 
 app.get('/read-json', (req, res) => {
-  db.all('SELECT * FROM messages', (err, rows) => {
+  db.all('SELECT * FROM hasil', (err, rows) => {
     if (err) {
       console.error('Error:', err);
       return res.status(500).json({ success: false, message: 'Gagal membaca data.' });
@@ -88,51 +88,9 @@ app.get('/api/tikdl', async (req, res) => {
 });
 
 
-app.get('/blob/edit', async (req, res) => {
-  console.log('Memasuki rute /blob/edit');
-  try {
-    const response = await axios.get(blobURL);
-    let data = response.data;
 
-    console.log('Data yang diambil:', data);
-
-    const newText = "dkckfkdkdk berhasil di edit";
-    if (!data.texts) data.texts = [];
-    data.texts.push(newText);
-
-    console.log('Data yang akan disimpan:', data);
-
-    const updateResponse = await axios.put(blobURL, JSON.stringify(data), {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${blobToken}`,
-      },
-    });
-
-    console.log('Status penyimpanan:', updateResponse.status);
-
-    if (updateResponse.status === 200) {
-      res.json({
-        success: true,
-        message: 'File berhasil diedit',
-        updatedData: data,
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        message: 'Gagal menyimpan file ke blob storage',
-      });
-    }
-  } catch (error) {
-    console.error('Error editing blob file:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Terjadi kesalahan saat mengedit file',
-      error: error.message,
-    });
-  }
-});
-
+    
+  
 
 
 app.get('/ping', (req, res) => {
@@ -179,12 +137,12 @@ app.get('/tikwm/download', async (req, res) => {
       console.log('Berhasil mendapatkan data TikTok:', tikDlData);
       return res.status(200).json({ success: true, data: tikDlData });
       const timestamp = new Date().toISOString();
-  db.run('INSERT INTO messages (message, timestamp) VALUES (?, ?)', [tikDlData, timestamp], function (err) {
+  db.run('INSERT INTO hasil (message, timestamp) VALUES (?, ?)', [tikDlData, timestamp], function (err) {
     if (err) {
       console.error('Error:', err);
-      return res.status(500).json({ success: false, message: 'Gagal menyimpan data.' });
+      console.log('gagal');
     }
-    res.status(200).json({ success: true, message: 'Data berhasil ditambahkan.', id: this.lastID });
+    console.log('berhasil menyimpan');
   });
     } else {
       return res.status(404).json({ error: 'Tidak ada data yang ditemukan untuk URL yang diberikan.' });
