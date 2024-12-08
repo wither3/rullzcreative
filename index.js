@@ -37,7 +37,7 @@ app.use((req, res, next) => {
 });
 const db = new sqlite3.Database(':memory:'); // Atau gunakan file DB untuk persistensi
 db.serialize(() => {
-  db.run('CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY, message TEXT, timestamp TEXT)');
+  db.run('CREATE TABLE IF NOT EXISTS hasil (id INTEGER PRIMARY KEY, message TEXT, timestamp TEXT)');
 });
 
 // Endpoint Debugging
