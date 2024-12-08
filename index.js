@@ -35,8 +35,7 @@ app.use((req, res, next) => {
   console.log(`Request received: ${req.method} ${req.path}`); // Log semua permintaan
   next();
 });
-const db = new sqlite3.Database(':memory:'); // Atau gunakan file DB untuk persistensi
-
+const db = new sqlite3.Database('database.db');
 
 // Endpoint Debugging
 app.get('/debug', (req, res) => {
