@@ -10,7 +10,6 @@ const Tiktok = require("@tobyg74/tiktok-api-dl");
 const path = require('path');
 const axios = require('axios');
 const https = require('https');
-const sqlite3 = require('sqlite3').verbose();
 const tiktokMain = require('./codenya/tiktokk');
 
 const apikey = `afba42893fmsha63e4a70440e54dp1d25a3jsn2511b8314ddb`;
@@ -35,14 +34,7 @@ app.use((req, res, next) => {
   console.log(`Request received: ${req.method} ${req.path}`); // Log semua permintaan
   next();
 });
-const dbPath = './database.db'; // Jalur file database
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Error membuka database:', err);
-  } else {
-    console.log('Database terbuka.');
-  }
-});
+
 // Endpoint Debugging
 app.get('/debug', (req, res) => {
   res.json({
@@ -83,48 +75,51 @@ app.get('/api/tikdl', async (req, res) => {
 });
 
 
-
-db.serialize(() => {
-  db.run('CREATE TABLE IF NOT EXISTS hasil (id INTEGER PRIMARY KEY, message TEXT, timestamp TEXT)');
-});
-
-app.get('/tikwm/download', async (req, res) => {
+app.get('/blob/edit', async (req, res) => {
+  console.log('Memasuki rute /blob/edit');
   try {
-    const url = req.query.url;
-    if (!url) {
-      return res.status(400).json({ error: 'URL TikTok harus diberikan dalam parameter "url".' });
-    }
+    const response = await axios.get(blobURL);
+    let data = response.data;
 
-    const tikDlData = await tiktokDl(url);
-    if (tikDlData) {
-      const timestamp = new Date().toISOString();
-      db.run('INSERT INTO hasil (message, timestamp) VALUES (?, ?)', [tikDlData, timestamp], function (err) {
-        if (err) {
-          console.error('Error menyimpan data:', err);
-          return res.status(500).json({ success: false, message: 'Gagal menyimpan data.' });
-        }
-        console.log('Berhasil menyimpan data ke database.');
-        return res.status(200).json({ success: true, data: tikDlData });
+    console.log('Data yang diambil:', data);
+
+    const newText = "dkckfkdkdk berhasil di edit";
+    if (!data.texts) data.texts = [];
+    data.texts.push(newText);
+
+    console.log('Data yang akan disimpan:', data);
+
+    const updateResponse = await axios.put(blobURL, JSON.stringify(data), {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${blobToken}`,
+      },
+    });
+
+    console.log('Status penyimpanan:', updateResponse.status);
+
+    if (updateResponse.status === 200) {
+      res.json({
+        success: true,
+        message: 'File berhasil diedit',
+        updatedData: data,
       });
     } else {
-      return res.status(404).json({ error: 'Tidak ada data yang ditemukan untuk URL yang diberikan.' });
+      res.status(500).json({
+        success: false,
+        message: 'Gagal menyimpan file ke blob storage',
+      });
     }
   } catch (error) {
-    console.error('Kesalahan saat mengunduh data TikTok:', error.message);
-    return res.status(500).json({ error: 'Terjadi kesalahan internal server.', detail: error.message });
+    console.error('Error editing blob file:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan saat mengedit file',
+      error: error.message,
+    });
   }
 });
 
-app.get('/read-json', (req, res) => {
-  db.all('SELECT * FROM hasil', (err, rows) => {
-    if (err) {
-      console.error('Error:', err);
-      return res.status(500).json({ success: false, message: 'Gagal membaca data.' });
-    }
-    res.status(200).json({ success: true, data: rows });
-  });
-});    
-  
 
 
 app.get('/ping', (req, res) => {
@@ -150,10 +145,62 @@ app.get('/ping', (req, res) => {
 
 
 // Data di memori
+const savedData = [];
 
+// Endpoint untuk menyimpan data
+
+
+// Endpoint untuk menyimpan data TikTok
+
+app.get('/tikwm/download', async (req, res) => {
+  try {
+    const url = req.query.url; // Ambil URL dari query parameter
+    if (!url) {
+      return res.status(400).json({ error: 'URL TikTok harus diberikan dalam parameter "url".' });
+    }
+
+    console.log('Mengunduh data TikTok untuk URL:', url);
+
+    const tikDlData = await tiktokDl(url);
+    if (tikDlData) {
+      console.log('Berhasil mendapatkan data TikTok:', tikDlData);
+      return res.status(200).json({ success: true, data: tikDlData });
+    } else {
+      return res.status(404).json({ error: 'Tidak ada data yang ditemukan untuk URL yang diberikan.' });
+    }
+  } catch (error) {
+    console.error('Kesalahan saat mengunduh data TikTok:', error.message);
+    return res.status(500).json({ error: 'Terjadi kesalahan internal server.', detail: error.message });
+  }
+});
     
 
 // Endpoint untuk melihat semua data yang disimpan
+app.get('/tikwm/data', async (req, res) => {
+  try {
+    // Baca data dari blob storage
+    const data = await readBlobData();
+    const limit = parseInt(req.query.limit, 10) || 10; // Default maksimal 10
+    const limitedData = data.slice(0, limit);
+
+    res.json({
+      success: true,
+      message: `Menampilkan ${limitedData.length} data dari blob storage`,
+      data: limitedData,
+    });
+  } catch (error) {
+    console.error('Error fetching data:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil data dari blob storage',
+      error: error.message,
+    });
+  }
+});
+
+
+// Endpoint untuk melihat semua data
+
 
 
 app.get("/msdown/download", async (req, res) => {
