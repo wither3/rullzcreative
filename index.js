@@ -35,8 +35,14 @@ app.use((req, res, next) => {
   console.log(`Request received: ${req.method} ${req.path}`); // Log semua permintaan
   next();
 });
-const db = new sqlite3.Database('database.db');
-
+const dbPath = './database.db'; // Jalur file database
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('Error membuka database:', err);
+  } else {
+    console.log('Database terbuka.');
+  }
+});
 // Endpoint Debugging
 app.get('/debug', (req, res) => {
   res.json({
