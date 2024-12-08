@@ -274,6 +274,11 @@ const negaranya = countries[negara];
 
     const Tanggalwaktu = `${tahun}-${bulan.toString().padStart(2, '0')}-${hari.toString().padStart(2, '0')} ${jam.toString().padStart(2, '0')}:${menit.toString().padStart(2, '0')}:${detik.toString().padStart(2, '0')}`;
 
+const ukuranByte = info.aweme_detail.video.play_addr.data_size;
+const ukuranMb = (ukuranByte / (1024 * 1024)).toFixed(2);
+  
+
+    
     return {
       videoId: videoId,
       authorId: info.aweme_detail.author_user_id,
@@ -293,10 +298,10 @@ const negaranya = countries[negara];
         shareWA: shareWA
       },
       video: {
-        size: info.aweme_detail.video.play_addr_h264.data_size,
-        link: info.aweme_detail.video.play_addr_h264.url_list[0],
-        link2:info.aweme_detail.video.play_addr_h264.url_list[1],
-    link3: info.aweme_detail.video.play_addr_h264.url_list[2]
+        size: `${ukuranMb} Mb`,
+        link: info.aweme_detail.video.play_addr.url_list[0],
+        link2:info.aweme_detail.video.play_add.url_list[1],
+    link3: info.aweme_detail.video.play_addr.url_list[2]
       },
       mp3: {
         author: info.aweme_detail.music.author,
