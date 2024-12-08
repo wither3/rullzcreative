@@ -300,7 +300,7 @@ const ukuranMb = (ukuranByte / (1024 * 1024)).toFixed(2);
       video: {
         size: `${ukuranMb} Mb`,
         link: info.aweme_detail.video.play_addr.url_list[0],
-        link2:info.aweme_detail.video.play_add.url_list[1],
+        link2:info.aweme_detail.video.play_addr.url_list[1],
     link3: info.aweme_detail.video.play_addr.url_list[2]
       },
       mp3: {
