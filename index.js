@@ -11,7 +11,6 @@ const path = require('path');
 const axios = require('axios');
 const https = require('https');
 const tiktokMain = require('./codenya/tiktokk');
-const ytdl = require("@distube/ytdl-core");
 
 const apikey = `afba42893fmsha63e4a70440e54dp1d25a3jsn2511b8314ddb`;
 const apikey2 = `44114406bbmshdee24010b885bc0p140418jsn3d9caf51b4b3`;
