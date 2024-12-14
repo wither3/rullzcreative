@@ -50,7 +50,21 @@ app.get('/debug', (req, res) => {
 
 
 
-
+app.get('/cuaca', async (req, res) => {
+    try {
+        const weatherData = await fetchWeatherForCities();
+        res.status(200).json({
+            status: 'success',
+            data: weatherData
+        });
+    } catch (error) {
+        console.error('Terjadi kesalahan:', error.message);
+        res.status(500).json({
+            status: 'error',
+            message: 'Gagal mengambil data cuaca'
+        });
+    }
+});
 
 app.get("/youTube/download", async (req, res) => {
   const url = req.query.url;
