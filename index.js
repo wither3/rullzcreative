@@ -12,6 +12,7 @@ const axios = require('axios');
 const https = require('https');
 const tiktokMain = require('./codenya/tiktokk');
 const { fetchWeatherForCities } = require('./codenya/cuaca');
+const { getGempaData } = require('./bmkg');
 
 const apikey = `afba42893fmsha63e4a70440e54dp1d25a3jsn2511b8314ddb`;
 const apikey2 = `44114406bbmshdee24010b885bc0p140418jsn3d9caf51b4b3`;
@@ -50,7 +51,21 @@ app.get('/debug', (req, res) => {
 
 
 
+app.get('/gempa', async (req, res) => {
+    try {
+        const gempaData = await getGempaData();
 
+        if (gempaData.error) {
+            return res.status(500).json({ error: 'Gagal mengambil data: ' + gempaData.error });
+        }
+
+        // Mengembalikan data gempa sebagai respons
+        res.json(gempaData);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Terjadi kesalahan saat mengambil data gempa' });
+    }
+});
 app.get('/cuaca', async (req, res) => {
     try {
         const weatherData = await fetchWeatherForCities();
