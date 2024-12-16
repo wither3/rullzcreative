@@ -15,6 +15,7 @@ const { fetchWeatherForCities } = require('./codenya/cuaca');
 const { getGempaData } = require('./codenya/bmkg');
 const { scrapeUSDtoIDR } = require('./codenya/uang'); // Import fungsi scraper
 
+const API_KEY = '552fb7eb710adde5563836d7';
 const apikey = `afba42893fmsha63e4a70440e54dp1d25a3jsn2511b8314ddb`;
 const apikey2 = `44114406bbmshdee24010b885bc0p140418jsn3d9caf51b4b3`;
 const apikey3 = `2d8efbca6cmshba7782a3d1b31bcp160901jsn1b8edec486b4`;
@@ -54,7 +55,29 @@ app.get('/debug', (req, res) => {
 
 
 
+app.get('/usdtorpv2', async (req, res) => {
+    try {
+        const url = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/USD`;
 
+        // Panggil API ExchangeRate-API
+        const response = await axios.get(url);
+
+        // Ambil nilai tukar dari USD ke IDR
+        const rate = response.data.conversion_rates.IDR;
+
+        // Kirim hasil sebagai JSON
+        res.status(200).json({
+            success: true,
+            rate: `1 USD = ${rate} IDR`
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Gagal mengambil data nilai tukar',
+            error: error.message
+        });
+    }
+});
 
 app.get('/usdtorp', async (req, res) => {
     try {
