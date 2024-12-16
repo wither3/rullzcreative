@@ -13,6 +13,7 @@ const https = require('https');
 const tiktokMain = require('./codenya/tiktokk');
 const { fetchWeatherForCities } = require('./codenya/cuaca');
 const { getGempaData } = require('./codenya/bmkg');
+const { scrapeUSDtoIDR } = require('./codenya/uang'); // Import fungsi scraper
 
 const apikey = `afba42893fmsha63e4a70440e54dp1d25a3jsn2511b8314ddb`;
 const apikey2 = `44114406bbmshdee24010b885bc0p140418jsn3d9caf51b4b3`;
@@ -51,6 +52,18 @@ app.get('/debug', (req, res) => {
 
 
 
+
+
+
+
+app.get('/usdtorp', async (req, res) => {
+    try {
+        const result = await scrapeUSDtoIDR(); // Panggil fungsi scraper
+        res.status(200).json({ success: true, rate: result });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Gagal mengambil nilai tukar', error: error.message });
+    }
+});
 app.get('/gempa', async (req, res) => {
     try {
         const gempaData = await getGempaData();
