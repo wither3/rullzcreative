@@ -19,6 +19,7 @@
     "rahad-all-downloader": "^2.1.17",
     "btch-downloader": "^2.8.2",
     "got": "^14.4.5",
-    "@distube/ytdl-core": "^4.15.1"
+    "@distube/ytdl-core": "^4.15.1",
+    "shannz-playwright": "^1.0.8"
   }
 }
