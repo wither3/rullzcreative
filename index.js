@@ -15,6 +15,7 @@ const { fetchWeatherForCities } = require('./codenya/cuaca');
 const { getGempaData } = require('./codenya/bmkg');
 const { scrapeUSDtoIDR } = require('./codenya/uang'); // Import fungsi scraper
 const { tiktokStalk } = require('./codenya/countik'); // Import fungsi tiktokStalk
+const chatbot = require('./codenya/gpt');
 
 const API_KEY = '552fb7eb710adde5563836d7';
 const apikey = `afba42893fmsha63e4a70440e54dp1d25a3jsn2511b8314ddb`;
@@ -53,7 +54,21 @@ app.get('/debug', (req, res) => {
 });
 
 
+app.get('/gpt', async (req, res) => {
+    const query = req.query.q; // Ambil query dari parameter URL
 
+    if (!query) {
+        return res.status(400).json({ error: 'Query tidak boleh kosong!' });
+    }
+
+    try {
+        const response = await chatbot.send(query); // Kirim pertanyaan ke chatbot
+        res.status(200).json({ success: true, response }); // Kirim respons sebagai JSON
+    } catch (error) {
+        console.error("Terjadi kesalahan:", error.message);
+        res.status(500).json({ success: false, error: "Terjadi kesalahan pada server!" });
+    }
+});
 app.get('/tikstalk', async (req, res) => {
     const username = req.query.username; // Ambil username dari query parameter
 
