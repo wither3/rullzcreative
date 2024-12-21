@@ -117,20 +117,12 @@ app.get('/usdtorp', async (req, res) => {
         res.status(500).json({ success: false, message: 'Gagal mengambil nilai tukar', error: error.message });
     }
 });
-app.get('/gempa', async (req, res) => {
-    try {
-        const gempaData = await getGempaData();
-
-        if (gempaData.error) {
-            return res.status(500).json({ error: 'Gagal mengambil data: ' + gempaData.error });
-        }
-
-        // Mengembalikan data gempa sebagai respons
-        res.json(gempaData);
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ error: 'Terjadi kesalahan saat mengambil data gempa' });
-    }
+app.get('/gempa', (req, res) => {
+  https.get('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json', (response) => {
+    let data = '';
+    response.on('data', chunk => data += chunk);
+    response.on('end', () => res.json(JSON.parse(data)));
+  }).on('error', err => res.status(500).send({ error: err.message }));
 });
 app.get('/cuaca', async (req, res) => {
     try {
