@@ -16,6 +16,7 @@ const { getGempaData } = require('./codenya/bmkg');
 const { scrapeUSDtoIDR } = require('./codenya/uang'); // Import fungsi scraper
 const { tiktokStalk } = require('./codenya/countik'); // Import fungsi tiktokStalk
 const chatbot = require('./codenya/gpt');
+const { spotidown } = require('./codenya/spotidown');
 
 const API_KEY = '552fb7eb710adde5563836d7';
 const apikey = `afba42893fmsha63e4a70440e54dp1d25a3jsn2511b8314ddb`;
@@ -53,7 +54,20 @@ app.get('/debug', (req, res) => {
   });
 });
 
+app.get('/spotify', async (req, res) => {
+  const { url } = req.query; // Ambil URL dari query parameter
+  if (!url) {
+    return res.status(400).json({ error: 'URL Spotify tidak boleh kosong.' });
+  }
 
+  try {
+    const data = await spotidown.download(url); // Ambil data dari fungsi download
+    res.json({ success: true, data }); // Kirim respons JSON
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ success: false, error: 'Gagal mengambil data dari Spotify.' });
+  }
+});
 app.get('/gpt', async (req, res) => {
     const query = req.query.q; // Ambil query dari parameter URL
 
