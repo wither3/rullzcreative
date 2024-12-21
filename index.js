@@ -55,7 +55,7 @@ app.get('/debug', (req, res) => {
 });
 
 app.get('/spotify', async (req, res) => {
-  const { url } = req.query.url; // Ambil URL dari query parameter
+  const url = req.query.url; // Ambil URL dari query parameter
   if (!url) {
     return res.status(400).json({ error: 'URL Spotify tidak boleh kosong.' });
   }
