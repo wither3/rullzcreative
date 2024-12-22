@@ -154,24 +154,7 @@ app.get('/cuaca', async (req, res) => {
     }
 });
 
-app.get("/youTube/download", async (req, res) => {
-  const url = req.query.url;
 
-  if (!url) {
-    return res.status(400).json({ error: "URL tidak ditemukan di parameter query" });
-  }
-
-  try {
-    // Mendapatkan informasi video
-    const info = await ytdl.getInfo(url);
-
-    // Mengembalikan seluruh informasi format video/audio
-    res.status(200).json(info.formats);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Gagal mengambil informasi video" });
-  }
-});
     
 app.get('/api/tikdl', async (req, res) => {
   try {
@@ -194,51 +177,8 @@ app.get('/api/tikdl', async (req, res) => {
 });
 
 
-app.get('/blob/edit', async (req, res) => {
-  console.log('Memasuki rute /blob/edit');
-  try {
-    const response = await axios.get(blobURL);
-    let data = response.data;
 
-    console.log('Data yang diambil:', data);
-
-    const newText = "dkckfkdkdk berhasil di edit";
-    if (!data.texts) data.texts = [];
-    data.texts.push(newText);
-
-    console.log('Data yang akan disimpan:', data);
-
-    const updateResponse = await axios.put(blobURL, JSON.stringify(data), {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${blobToken}`,
-      },
-    });
-
-    console.log('Status penyimpanan:', updateResponse.status);
-
-    if (updateResponse.status === 200) {
-      res.json({
-        success: true,
-        message: 'File berhasil diedit',
-        updatedData: data,
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        message: 'Gagal menyimpan file ke blob storage',
-      });
-    }
-  } catch (error) {
-    console.error('Error editing blob file:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Terjadi kesalahan saat mengedit file',
-      error: error.message,
-    });
-  }
-});
-
+      
 
 
 app.get('/ping', (req, res) => {
@@ -295,27 +235,6 @@ app.get('/tikwm/download', async (req, res) => {
     
 
 // Endpoint untuk melihat semua data yang disimpan
-app.get('/tikwm/data', async (req, res) => {
-  try {
-    // Baca data dari blob storage
-    const data = await readBlobData();
-    const limit = parseInt(req.query.limit, 10) || 10; // Default maksimal 10
-    const limitedData = data.slice(0, limit);
-
-    res.json({
-      success: true,
-      message: `Menampilkan ${limitedData.length} data dari blob storage`,
-      data: limitedData,
-    });
-  } catch (error) {
-    console.error('Error fetching data:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Gagal mengambil data dari blob storage',
-      error: error.message,
-    });
-  }
-});
 
 
 // Endpoint untuk melihat semua data
@@ -382,25 +301,7 @@ app.get("/ssstik/download", async (req, res) => {
   }
 });
 
-app.get('/youtube/download', async (req, res) => {
-  const url = req.query.url; // URL diterima dari query parameter
-  
-  if (!url) {
-    return res.status(400).json({ success: false, message: 'URL is required' });
-  }
 
-  try {
-    const info = await ytdl.getInfo(url);
-    const formats = info.formats.map(format => ({
-      quality: format.qualityLabel || 'Unknown',
-      mimeType: format.mimeType,
-      url: format.url
-    }));
-    res.json({ success: true, formats });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
 
 app.get('/apelmusik/download', async (req, res) => {
     const url = req.query.url; // URL diambil dari query parameter
