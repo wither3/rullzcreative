@@ -113,21 +113,7 @@ app.get('/tikstalk', async (req, res) => {
 
 
 
-app.get('/usdtorp', async (req, res) => {
-    try {
-        const result = await scrapeUSDtoIDR(); // Panggil fungsi scraper
-        res.status(200).json({ success: true, rate: result });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Gagal mengambil nilai tukar', error: error.message });
-    }
-});
-app.get('/gempa', (req, res) => {
-  https.get('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json', (response) => {
-    let data = '';
-    response.on('data', chunk => data += chunk);
-    response.on('end', () => res.json(JSON.parse(data)));
-  }).on('error', err => res.status(500).send({ error: err.message }));
-});
+
 app.get('/cuaca', async (req, res) => {
     try {
         const weatherData = await fetchWeatherForCities();
