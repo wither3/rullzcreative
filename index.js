@@ -24,6 +24,7 @@ const apikey2 = `44114406bbmshdee24010b885bc0p140418jsn3d9caf51b4b3`;
 const apikey3 = `2d8efbca6cmshba7782a3d1b31bcp160901jsn1b8edec486b4`;
 const blobURL = 'https://pm6jctnwwrulrr4g.public.blob.vercel-storage.com/tiktok_downloads-dC42MVKaPuFrsE8Ey4NztLqXnlHppm.json';
 const apiKeys = [apikey, apikey2, apikey3];
+const igStalk = require("./igstalk.js");
 
 const blobToken = 'BLOB_READ_WRITE_TOKEN';
 const app = express();
@@ -52,6 +53,17 @@ app.get('/debug', (req, res) => {
     tiksave: typeof downloadTikTok,
     directory: __dirname,
   });
+});
+
+
+app.get('/igstalk', async (req, res) => {
+  const username = req.query.username;
+  if (!username) {
+    return res.status(400).json({ error: 'Username tidak diberikan' });
+  }
+
+  const data = await igStalk(username);
+  res.json(data);
 });
 
 app.get('/spotify', async (req, res) => {
