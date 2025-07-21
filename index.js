@@ -111,29 +111,7 @@ app.get('/tikstalk', async (req, res) => {
     }
 });
 
-app.get('/usdtorpv2', async (req, res) => {
-    try {
-        const url = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/USD`;
 
-        // Panggil API ExchangeRate-API
-        const response = await axios.get(url);
-
-        // Ambil nilai tukar dari USD ke IDR
-        const rate = response.data.conversion_rates.IDR;
-
-        // Kirim hasil sebagai JSON
-        res.status(200).json({
-            success: true,
-            rate: `1 USD = ${rate} IDR`
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Gagal mengambil data nilai tukar',
-            error: error.message
-        });
-    }
-});
 
 app.get('/usdtorp', async (req, res) => {
     try {
